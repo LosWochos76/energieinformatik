@@ -1,0 +1,48 @@
+﻿<Window x:Class="TimeSeriesGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ts="clr-namespace:TimeSeries;assembly=TimeSeries"
+        xmlns:local="clr-namespace:TimeSeriesGUI"
+        mc:Ignorable="d"
+        Title="TimeSeries Browser" Width="1200">
+    <Window.Resources>
+        <GridView x:Key="view">
+            <GridViewColumn Header="Zeitpunkt" Width="120" DisplayMemberBinding="{Binding Delivery, StringFormat='dd.MM.yyyy HH:mm'}" />
+            <GridViewColumn Header="Wert" Width="120" DisplayMemberBinding="{Binding Value}" />
+        </GridView>
+    </Window.Resources>
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top" HorizontalAlignment="Stretch" ToolBarTray.IsLocked="True">
+            <DatePicker SelectedDate="{Binding From}" />
+            <DatePicker SelectedDate="{Binding To}" />
+        </ToolBar>
+        <StatusBar DockPanel.Dock="Bottom">
+        </StatusBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TreeView ItemsSource="{Binding AllSeries}" SelectedItemChanged="TreeView_SelectedItemChanged">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type local:TimeSeriesViewModel}" ItemsSource="{Binding SubSeries}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Series.Name}" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+            <TabControl Grid.Column="2">
+                <TabItem Header="Tabelle">
+                    <ListView  ItemsSource="{Binding CurrentData}" View="{StaticResource view}" />
+                </TabItem>
+                <TabItem Header="Grafik">
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,30 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2043
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeSeries", "TimeSeries\TimeSeries.csproj", "{4EB7A641-B252-4657-9E37-8698DCFFFC88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeSeriesBrowser", "TimeSeriesBrowser\TimeSeriesBrowser.csproj", "{1824CC29-FB24-4D1D-849C-51CE45EB4523}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4EB7A641-B252-4657-9E37-8698DCFFFC88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EB7A641-B252-4657-9E37-8698DCFFFC88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EB7A641-B252-4657-9E37-8698DCFFFC88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EB7A641-B252-4657-9E37-8698DCFFFC88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1824CC29-FB24-4D1D-849C-51CE45EB4523}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1824CC29-FB24-4D1D-849C-51CE45EB4523}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1824CC29-FB24-4D1D-849C-51CE45EB4523}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1824CC29-FB24-4D1D-849C-51CE45EB4523}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {154140F0-E818-4BC7-9E74-C656A8316DBC}
+	EndGlobalSection
+EndGlobal
