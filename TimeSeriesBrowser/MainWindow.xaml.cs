@@ -22,5 +22,10 @@ namespace TimeSeriesGUI
 
             view_model.CurrentSeries = tsvm;
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            view_model.Dispose();
+        }
     }
 }

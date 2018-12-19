@@ -1,4 +1,4 @@
-﻿namespace TimeSeries
+﻿namespace DataModel.TimeSeries
 {
     public enum Unit
     {

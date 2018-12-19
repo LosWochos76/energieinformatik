@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using TimeSeries;
+using DataModel;
+using DataModel.TimeSeries;
 
 namespace TimeSeriesGUI
 {
-    public class ViewModel
+    public class ViewModel : IDisposable
     {
-        private MySqlStore store;
+        private RabbitClient client;
         private TimeSeriesViewModel current_series;
         private DateTime from;
         private DateTime to;
@@ -23,7 +24,7 @@ namespace TimeSeriesGUI
             AllSeries = new ObservableCollection<TimeSeriesViewModel>();
             CurrentData = new ObservableCollection<TimeSeriesValue>();
 
-            store = new MySqlStore("SERVER=localhost;DATABASE=timeseries;UID=root");
+            client = new RabbitClient();
             CreateTimeSeriesViewModel();
         }
 
@@ -37,12 +38,12 @@ namespace TimeSeriesGUI
             }
         }
 
-        private void CreateTimeSeriesViewModel()
+        private async void CreateTimeSeriesViewModel()
         {
             AllSeries.Clear();
             CurrentData.Clear();
 
-            var original = store.GetAllTimeSeries();
+            var original = await client.GetAllTimeSeries();
             var root = from i in original where i.ParentID == 0 select i;
 
             foreach (var s in root)
@@ -53,10 +54,14 @@ namespace TimeSeriesGUI
             }
         }
 
-        private void AddSubs(TimeSeriesViewModel tsvm, List<TimeSeries.TimeSeries> original)
+        private void AddSubs(TimeSeriesViewModel tsvm, TimeSeries[] original)
         {
             var subs = from i in original where i.ParentID == tsvm.Series.ID select new TimeSeriesViewModel(i);
-            tsvm.SubSeries = subs.ToList<TimeSeriesViewModel>();
+
+            foreach (var s in subs)
+            {
+                tsvm.SubSeries.Add(s);
+            }
 
             foreach (var u in tsvm.SubSeries)
             {
@@ -85,16 +90,21 @@ namespace TimeSeriesGUI
             }
         }
 
-        private void UpdateData()
+        private async void UpdateData()
         {
             if (current_series == null)
                 return;
 
-            var data = store.GetData(current_series.Series, new TimeRange(From, To));
+            var data = await client.GetTimeSeriesData(current_series.Series, new TimeRange(From, To));
             CurrentData.Clear();
 
             foreach (var d in data.Values)
                 CurrentData.Add(d);
+        }
+
+        public void Dispose()
+        {
+            this.client.Dispose();
         }
     }
 }

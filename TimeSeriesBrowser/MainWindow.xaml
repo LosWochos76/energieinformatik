@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ts="clr-namespace:TimeSeries;assembly=TimeSeries"
+        xmlns:ts="clr-namespace:DataModel;assembly=DataModel"
         xmlns:local="clr-namespace:TimeSeriesGUI"
         mc:Ignorable="d"
-        Title="TimeSeries Browser" Width="1200">
+        Title="TimeSeries Browser" Width="1200" Closing="Window_Closing">
     <Window.Resources>
         <GridView x:Key="view">
             <GridViewColumn Header="Zeitpunkt" Width="120" DisplayMemberBinding="{Binding Delivery, StringFormat='dd.MM.yyyy HH:mm'}" />

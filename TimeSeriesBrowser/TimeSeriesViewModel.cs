@@ -1,22 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using DataModel.TimeSeries;
+using System.Collections.ObjectModel;
 
 namespace TimeSeriesGUI
 {
     public class TimeSeriesViewModel
     {
-        private TimeSeries.TimeSeries ts;
-
-        public TimeSeriesViewModel(TimeSeries.TimeSeries ts)
+        public TimeSeriesViewModel(TimeSeries ts)
         {
-            this.ts = ts;
+            Series = ts;
+            SubSeries = new ObservableCollection<TimeSeriesViewModel>();
         }
 
-        public TimeSeries.TimeSeries Series
-        {
-            get { return ts; }
-        }
-
-        public List<TimeSeriesViewModel> SubSeries { get; set; }
+        public TimeSeries Series { get; private set; }
+        public ObservableCollection<TimeSeriesViewModel> SubSeries { get; set; }
         public TimeSeriesViewModel Parent { get; set; }
     }
 }

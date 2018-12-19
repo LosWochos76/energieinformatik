@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TimeSeries
+namespace DataModel.TimeSeries
 {
     public class TimeRange
     {
