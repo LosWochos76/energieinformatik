@@ -1,47 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
-using DataModel;
+using System.Runtime.CompilerServices;
 using DataModel.TimeSeries;
 
 namespace TimeSeriesGUI
 {
-    public class ViewModel : IDisposable
+    public class MainWindowViewModel : IDisposable, INotifyPropertyChanged
     {
         private RabbitClient client;
         private TimeSeriesViewModel current_series;
-        private DateTime from;
-        private DateTime to;
 
-        public ObservableCollection<TimeSeriesValue> CurrentData { get; private set; }
+        public event PropertyChangedEventHandler PropertyChanged;
         public ObservableCollection<TimeSeriesViewModel> AllSeries { get; private set; }
 
-        public ViewModel()
+        public MainWindowViewModel()
         {
-            To = DateTime.Now.Date.AddDays(1);
-            From = To.AddDays(-7);
             AllSeries = new ObservableCollection<TimeSeriesViewModel>();
-            CurrentData = new ObservableCollection<TimeSeriesValue>();
-
-            client = new RabbitClient();
+            client = ServiceInjector.GetInstance().GetRabbitClient();
             CreateTimeSeriesViewModel();
         }
 
-        public TimeSeriesViewModel CurrentSeries
+        public TimeSeriesViewModel CurrentSeries 
         {
             get { return current_series; }
             set
             {
                 current_series = value;
-                UpdateData();
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("HasSeriesSelected");
             }
+        }
+
+        public bool HasSeriesSelected
+        {
+            get { return current_series != null; }
         }
 
         private async void CreateTimeSeriesViewModel()
         {
             AllSeries.Clear();
-            CurrentData.Clear();
 
             var original = await client.GetAllTimeSeries();
             var root = from i in original where i.ParentID == 0 select i;
@@ -70,41 +69,14 @@ namespace TimeSeriesGUI
             }
         }
 
-        public DateTime From
-        {
-            get { return from; }
-            set
-            {
-                from = value;
-                UpdateData();
-            }
-        }
-
-        public DateTime To
-        {
-            get { return to; }
-            set
-            {
-                to = value;
-                UpdateData();
-            }
-        }
-
-        private async void UpdateData()
-        {
-            if (current_series == null)
-                return;
-
-            var data = await client.GetTimeSeriesData(current_series.Series, new TimeRange(From, To));
-            CurrentData.Clear();
-
-            foreach (var d in data.Values)
-                CurrentData.Add(d);
-        }
-
         public void Dispose()
         {
             this.client.Dispose();
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

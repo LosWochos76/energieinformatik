@@ -1,25 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DataModel.TimeSeries
 {
     public class TimeSeriesData
     {
-        public TimeSeries Series { get; private set; }
-        private List<TimeSeriesValue> values = new List<TimeSeriesValue>();
+        public int TimeSeriesID { get; set; }
+        public List<TimeSeriesValue> Values { get; set; }
 
-        public TimeSeriesData(TimeSeries series)
+        public TimeSeriesData(int time_series_id)
         {
-            Series = series;
+            TimeSeriesID = time_series_id;
+            Values = new List<TimeSeriesValue>();
         }
 
         public void Add(TimeSeriesValue v)
         {
-            values.Add(v);
+            Values.Add(v);
         }
 
-        public List<TimeSeriesValue> Values
+        public void Set(DateTime d, double value)
         {
-            get { return values; }
+            foreach (var v in Values)
+            {
+                if (v.Delivery == d)
+                {
+                    v.Value = value;
+                    return;
+                }
+            }
+
+            Values.Add(new TimeSeriesValue() { Delivery = d, Value = value });
+        }
+
+        public void Add(IEnumerable<TimeSeriesValue> values)
+        {
+            foreach (var d in values)
+            {
+                Set(d.Delivery, d.Value);
+            }
         }
     }
 }

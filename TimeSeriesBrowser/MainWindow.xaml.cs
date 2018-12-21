@@ -4,13 +4,13 @@ namespace TimeSeriesGUI
 {
     public partial class MainWindow : Window
     {
-        private ViewModel view_model;
+        private MainWindowViewModel view_model;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            view_model = new ViewModel();
+            view_model = new MainWindowViewModel();
             DataContext = view_model;
         }
 
@@ -25,7 +25,23 @@ namespace TimeSeriesGUI
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            view_model.Dispose();
+            ServiceInjector.GetInstance().Dispose();
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void Table_Click(object sender, RoutedEventArgs e)
+        {
+            var table = new TimeSeriesTable(view_model.CurrentSeries);
+            table.Show();
+        }
+
+        private void Graph_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

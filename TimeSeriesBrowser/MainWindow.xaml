@@ -6,43 +6,27 @@
         xmlns:ts="clr-namespace:DataModel;assembly=DataModel"
         xmlns:local="clr-namespace:TimeSeriesGUI"
         mc:Ignorable="d"
-        Title="TimeSeries Browser" Width="1200" Closing="Window_Closing">
-    <Window.Resources>
-        <GridView x:Key="view">
-            <GridViewColumn Header="Zeitpunkt" Width="120" DisplayMemberBinding="{Binding Delivery, StringFormat='dd.MM.yyyy HH:mm'}" />
-            <GridViewColumn Header="Wert" Width="120" DisplayMemberBinding="{Binding Value}" />
-        </GridView>
-    </Window.Resources>
+        Title="TimeSeries Browser" Width="800" Height="600" Closing="Window_Closing">
     <DockPanel>
-        <ToolBar DockPanel.Dock="Top" HorizontalAlignment="Stretch" ToolBarTray.IsLocked="True">
-            <DatePicker SelectedDate="{Binding From}" />
-            <DatePicker SelectedDate="{Binding To}" />
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_Datei">
+                <MenuItem Header="Beenden" Click="Exit_Click" />
+            </MenuItem>
+        </Menu>
+        <ToolBar DockPanel.Dock="Top">
+            <Button IsEnabled="{Binding HasSeriesSelected}" Click="Table_Click">Tabelle</Button>
+            <Button IsEnabled="{Binding HasSeriesSelected}" Click="Graph_Click">Grafik</Button>
         </ToolBar>
         <StatusBar DockPanel.Dock="Bottom">
         </StatusBar>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TreeView ItemsSource="{Binding AllSeries}" SelectedItemChanged="TreeView_SelectedItemChanged">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type local:TimeSeriesViewModel}" ItemsSource="{Binding SubSeries}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Series.Name}" />
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                </TreeView.Resources>
-            </TreeView>
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
-            <TabControl Grid.Column="2">
-                <TabItem Header="Tabelle">
-                    <ListView  ItemsSource="{Binding CurrentData}" View="{StaticResource view}" />
-                </TabItem>
-                <TabItem Header="Grafik">
-                </TabItem>
-            </TabControl>
-        </Grid>
+        <TreeView ItemsSource="{Binding AllSeries}" SelectedItemChanged="TreeView_SelectedItemChanged">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type local:TimeSeriesViewModel}" ItemsSource="{Binding SubSeries}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Series.Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
     </DockPanel>
 </Window>

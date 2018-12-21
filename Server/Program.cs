@@ -11,14 +11,11 @@ namespace Server
         {
             LogProvider.SetCurrentLogProvider(ConsoleLogProvider.Instance);
 
-            using (var store = new MySqlStore(connection_string))
+            using (var handler = new RabbitServer(connection_string))
             {
-                using (var handler = new RabbitServer(store))
-                {
-                    handler.Serve();
-                    Console.WriteLine("Server started. Press Enter to stop...");
-                    Console.ReadLine();
-                }
+                handler.Serve();
+                Console.WriteLine("Server started. Press Enter to stop...");
+                Console.ReadLine();
             }
         }
     }

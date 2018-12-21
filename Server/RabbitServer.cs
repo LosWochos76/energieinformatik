@@ -1,6 +1,7 @@
 ﻿using DataModel.Messages;
 using DataModel.TimeSeries;
 using EasyNetQ;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,12 +10,19 @@ namespace Server
 {
     class RabbitServer : IDisposable
     {
-        private MySqlStore store;
+        private MySqlConnection connection;
         private IBus bus;
+        private TimeSeriesRepository ts_repository;
+        private TimeSeriesDataRepository tsd_repository;
 
-        public RabbitServer(MySqlStore store)
+        public RabbitServer(string connection_string)
         {
-            this.store = store;
+            connection = new MySqlConnection(connection_string);
+            connection.Open();
+
+            this.ts_repository = new TimeSeriesRepository(connection);
+            this.tsd_repository = new TimeSeriesDataRepository(connection);
+
             this.bus = RabbitHutch.CreateBus("host=localhost");
         }
 
@@ -22,13 +30,16 @@ namespace Server
         {
             bus.RespondAsync<GetAllTimeSeriesRequest, TimeSeries[]>(GetAllTimeSeriesAsync);
             bus.RespondAsync<GetTimeSeriesDataRequest, TimeSeriesData>(GetTimeSeriesDataAsync);
+            bus.RespondAsync<SaveTimeSeriesDataRequest, SuccessMessage>(SaveTimeSeriesData);
+            bus.RespondAsync<DeleteTimeSeriesDataRequest, SuccessMessage>(DeleteTimeSeriesData);
+            bus.RespondAsync<DeleteTimeSeriesRequest, SuccessMessage>(DeleteTimeSeries);
         }
 
         private Task<TimeSeries[]> GetAllTimeSeriesAsync(GetAllTimeSeriesRequest r)
         {
             return Task.Factory.StartNew(() =>
             {
-                return store.GetAllTimeSeries();
+                return ts_repository.GetAllTimeSeries();
             });
         }
 
@@ -36,12 +47,37 @@ namespace Server
         {
             return Task.Factory.StartNew(() =>
             {
-                return store.GetTimeSeriesData(r.TimeSeriesID, r.Range);
+                return tsd_repository.GetTimeSeriesData(r.TimeSeriesID, r.Range);
+            });
+        }
+
+        public Task<SuccessMessage> SaveTimeSeriesData(SaveTimeSeriesDataRequest r)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return tsd_repository.SaveTimeSeriesData(r.Data);
+            });
+        }
+
+        public Task<SuccessMessage> DeleteTimeSeriesData(DeleteTimeSeriesDataRequest r)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return tsd_repository.DeleteTimeSeriesData(r.TimeSeriesID, r.From, r.To);
+            });
+        }
+
+        public Task<SuccessMessage> DeleteTimeSeries(DeleteTimeSeriesRequest r)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return ts_repository.DeleteTimeSeries(r.TimeSeriesID);
             });
         }
 
         public void Dispose()
         {
+            this.connection.Close();
             this.bus.Dispose();
         }
     }

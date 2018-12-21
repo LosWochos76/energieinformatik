@@ -1,0 +1,37 @@
+﻿<Window x:Class="TimeSeriesGUI.TimeSeriesTable"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TimeSeriesGUI"
+        mc:Ignorable="d"
+        Title="TimeSeriesTable" Height="450" Width="400">
+    <Window.Resources>
+        <GridView x:Key="view">
+            <GridViewColumn Header="Zeitpunkt" Width="120" DisplayMemberBinding="{Binding Delivery, StringFormat='dd.MM.yyyy HH:mm'}" />
+            <GridViewColumn Header="Wert" Width="120" DisplayMemberBinding="{Binding Value}" />
+        </GridView>
+    </Window.Resources>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Export">
+                <MenuItem Header="To Clipboard" Click="ToClipboard_Click"/>
+            </MenuItem>
+            <MenuItem Header="Import">
+                <MenuItem Header="From Clipboard" Click="FromClipboard_Click"/>
+            </MenuItem>
+        </Menu>
+        <ToolBar DockPanel.Dock="Top" HorizontalAlignment="Stretch" ToolBarTray.IsLocked="True">
+            <DatePicker SelectedDate="{Binding From}" />
+            <DatePicker SelectedDate="{Binding To}" />
+            <Button Click="Save_Click">Speichern</Button>
+            <Button Click="Delete_Click">Löschen</Button>
+        </ToolBar>
+        <DataGrid ItemsSource="{Binding CurrentData}" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Datum" Binding="{Binding Delivery, StringFormat='dd.MM.yyy HH:mm'}" />
+                <DataGridTextColumn Header="Wert" Binding="{Binding Value, StringFormat=N2}" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

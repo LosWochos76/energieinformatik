@@ -3,7 +3,6 @@ using DataModel.TimeSeries;
 using EasyNetQ;
 using EasyNetQ.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace TimeSeriesGUI
@@ -33,6 +32,18 @@ namespace TimeSeriesGUI
         {
             var request = new GetTimeSeriesDataRequest(series.ID, range);
             return bus.RequestAsync<GetTimeSeriesDataRequest, TimeSeriesData>(request);
+        }
+
+        public Task<SuccessMessage> SaveTimeSeriesData(TimeSeriesData data)
+        {
+            var request = new SaveTimeSeriesDataRequest(data);
+            return bus.RequestAsync<SaveTimeSeriesDataRequest, SuccessMessage>(request);
+        }
+
+        public Task<SuccessMessage> DeleteTimeSeriesData(int time_series_id, DateTime from, DateTime to)
+        {
+            var request = new DeleteTimeSeriesDataRequest() { TimeSeriesID = time_series_id, From = from, To = to };
+            return bus.RequestAsync<DeleteTimeSeriesDataRequest, SuccessMessage>(request);
         }
     }
 }

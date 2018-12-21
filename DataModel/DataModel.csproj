@@ -67,8 +67,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Messages\DeleteTimeSeriesDataRequest.cs" />
     <Compile Include="Messages\GetAllTimeSeriesRequest.cs" />
     <Compile Include="Messages\GetTimeSeriesDataRequest.cs" />
+    <Compile Include="Messages\SaveTimeSeriesDataRequest.cs" />
+    <Compile Include="Messages\SuccessMessage.cs" />
     <Compile Include="TimeSeries\TimeRange.cs" />
     <Compile Include="TimeSeries\TimeSeries.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
