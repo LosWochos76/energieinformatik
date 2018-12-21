@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Messages\DeleteTimeSeriesDataRequest.cs" />
+    <Compile Include="Messages\DeleteTimeSeriesRequest.cs" />
     <Compile Include="Messages\GetAllTimeSeriesRequest.cs" />
     <Compile Include="Messages\GetTimeSeriesDataRequest.cs" />
     <Compile Include="Messages\SaveTimeSeriesDataRequest.cs" />
