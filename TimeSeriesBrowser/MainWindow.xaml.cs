@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using DataModel.TimeSeries;
+using System;
+using System.Windows;
 
 namespace TimeSeriesGUI
 {
@@ -16,11 +18,11 @@ namespace TimeSeriesGUI
 
         private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var tsvm = e.NewValue as TimeSeriesViewModel;
-            if (tsvm == null)
+            var ts = e.NewValue as TimeSeries;
+            if (ts == null)
                 return;
 
-            view_model.CurrentSeries = tsvm;
+            view_model.CurrentSeries = ts;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -33,15 +35,61 @@ namespace TimeSeriesGUI
             Close();
         }
 
-        private void Table_Click(object sender, RoutedEventArgs e)
+        private void ToClipboard_Click(object sender, RoutedEventArgs e)
         {
-            var table = new TimeSeriesTable(view_model.CurrentSeries);
-            table.Show();
+            view_model.ExportToClipboard();
         }
 
-        private void Graph_Click(object sender, RoutedEventArgs e)
+        private void FromClipboard_Click(object sender, RoutedEventArgs e)
         {
+            view_model.ImportFromClipboard();
+        }
 
+        private void Save_Data_Click(object sender, RoutedEventArgs e)
+        {
+            view_model.Save();
+        }
+
+        private void Delete_Data_Click(object sender, RoutedEventArgs e)
+        {
+            view_model.Delete();
+        }
+
+        private async void New_TimeSeries_Click(object sender, RoutedEventArgs e)
+        {
+            var series = new TimeSeries();
+            var dialog = new TimeSeriesDialog(series);
+            var result = dialog.ShowDialog();
+
+            if (result.HasValue && result.Value)
+            {
+                var client_result = await ServiceInjector.GetInstance().GetRabbitClient().SaveTimeSeries(series);
+                if (client_result.Success)
+                {
+                    view_model.AllSeries.Add(series);
+                    view_model.CurrentSeries = series;
+                }
+                else
+                {
+                    MessageBox.Show(this, "Error: " + client_result.ErrorMessage);
+                }
+            }
+        }
+
+        private async void Edit_TimeSeries_Click(object sender, RoutedEventArgs e)
+        {
+            var series = view_model.CurrentSeries;
+            var dialog = new TimeSeriesDialog(series);
+            var result = dialog.ShowDialog();
+
+            if (result.HasValue && result.Value)
+            {
+                var client_result = await ServiceInjector.GetInstance().GetRabbitClient().SaveTimeSeries(series);
+                if (!client_result.Success)
+                { 
+                    MessageBox.Show(this, "Error: " + client_result.ErrorMessage);
+                }
+            }
         }
     }
 }

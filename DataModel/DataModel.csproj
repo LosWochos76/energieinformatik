@@ -72,6 +72,7 @@
     <Compile Include="Messages\GetAllTimeSeriesRequest.cs" />
     <Compile Include="Messages\GetTimeSeriesDataRequest.cs" />
     <Compile Include="Messages\SaveTimeSeriesDataRequest.cs" />
+    <Compile Include="Messages\SaveTimeSeriesRequest.cs" />
     <Compile Include="Messages\SuccessMessage.cs" />
     <Compile Include="TimeSeries\TimeRange.cs" />
     <Compile Include="TimeSeries\TimeSeries.cs" />

@@ -12,21 +12,36 @@
             <MenuItem Header="_Datei">
                 <MenuItem Header="Beenden" Click="Exit_Click" />
             </MenuItem>
+            <MenuItem Header="_Zeitreihe">
+                <MenuItem Header="Neu" Click="New_TimeSeries_Click" />
+                <MenuItem Header="Ändern" Click="Edit_TimeSeries_Click" IsEnabled="{Binding HasSeriesSelected}" />
+                <MenuItem Header="Löschen" IsEnabled="{Binding HasSelectedSeries}" />
+            </MenuItem>
+            <MenuItem Header="_Daten" IsEnabled="{Binding HasSeriesSelected}">
+                <MenuItem Header="Speichern" Click="Save_Data_Click" />
+                <MenuItem Header="Löschen" Click="Delete_Data_Click" />
+                <MenuItem Header="Export in die Zwischenablage" Click="ToClipboard_Click" />
+                <MenuItem Header="Import aus der Zwischenablage" Click="FromClipboard_Click" />
+            </MenuItem>
         </Menu>
         <ToolBar DockPanel.Dock="Top">
-            <Button IsEnabled="{Binding HasSeriesSelected}" Click="Table_Click">Tabelle</Button>
-            <Button IsEnabled="{Binding HasSeriesSelected}" Click="Graph_Click">Grafik</Button>
+            <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding AllSeries}" SelectedItem="{Binding CurrentSeries}" HorizontalAlignment="Stretch" Width="200">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Name}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <DatePicker SelectedDate="{Binding From}" />
+            <DatePicker SelectedDate="{Binding To}" />
         </ToolBar>
-        <StatusBar DockPanel.Dock="Bottom">
-        </StatusBar>
-        <TreeView ItemsSource="{Binding AllSeries}" SelectedItemChanged="TreeView_SelectedItemChanged">
-            <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type local:TimeSeriesViewModel}" ItemsSource="{Binding SubSeries}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Series.Name}" />
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-            </TreeView.Resources>
-        </TreeView>
+        <DataGrid ItemsSource="{Binding CurrentData}" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Datum" Binding="{Binding Delivery, StringFormat='dd.MM.yyy HH:mm'}" />
+                <DataGridTextColumn Header="Wert" Binding="{Binding Value, StringFormat=N2}" />
+            </DataGrid.Columns>
+        </DataGrid>
     </DockPanel>
 </Window>

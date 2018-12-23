@@ -1,28 +1,36 @@
-﻿using System;
+﻿using DataModel.TimeSeries;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using DataModel.TimeSeries;
 
 namespace TimeSeriesGUI
 {
     public class MainWindowViewModel : IDisposable, INotifyPropertyChanged
     {
         private RabbitClient client;
-        private TimeSeriesViewModel current_series;
+        private TimeSeries[] original_series;
+        private TimeSeries current_series;
+        private DateTime from;
+        private DateTime to;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public ObservableCollection<TimeSeriesViewModel> AllSeries { get; private set; }
+        public ObservableCollection<TimeSeries> AllSeries { get; private set; }
+        public ObservableCollection<TimeSeriesValue> CurrentData { get; private set; }
 
         public MainWindowViewModel()
         {
-            AllSeries = new ObservableCollection<TimeSeriesViewModel>();
+            To = DateTime.Now.Date;
+            From = To.AddDays(-7);
+
+            AllSeries = new ObservableCollection<TimeSeries>();
+            CurrentData = new ObservableCollection<TimeSeriesValue>();
+
             client = ServiceInjector.GetInstance().GetRabbitClient();
             CreateTimeSeriesViewModel();
         }
 
-        public TimeSeriesViewModel CurrentSeries 
+        public TimeSeries CurrentSeries 
         {
             get { return current_series; }
             set
@@ -30,6 +38,7 @@ namespace TimeSeriesGUI
                 current_series = value;
                 NotifyPropertyChanged();
                 NotifyPropertyChanged("HasSeriesSelected");
+                ReloadDataFromServer();
             }
         }
 
@@ -40,32 +49,12 @@ namespace TimeSeriesGUI
 
         private async void CreateTimeSeriesViewModel()
         {
+            original_series = await client.GetAllTimeSeries();
+
             AllSeries.Clear();
-
-            var original = await client.GetAllTimeSeries();
-            var root = from i in original where i.ParentID == 0 select i;
-
-            foreach (var s in root)
+            foreach (var s in original_series)
             {
-                var vms = new TimeSeriesViewModel(s);
-                AllSeries.Add(vms);
-                AddSubs(vms, original);
-            }
-        }
-
-        private void AddSubs(TimeSeriesViewModel tsvm, TimeSeries[] original)
-        {
-            var subs = from i in original where i.ParentID == tsvm.Series.ID select new TimeSeriesViewModel(i);
-
-            foreach (var s in subs)
-            {
-                tsvm.SubSeries.Add(s);
-            }
-
-            foreach (var u in tsvm.SubSeries)
-            {
-                u.Parent = tsvm;
-                AddSubs(u, original);
+                AllSeries.Add(s);
             }
         }
 
@@ -77,6 +66,69 @@ namespace TimeSeriesGUI
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public DateTime From
+        {
+            get { return from; }
+            set
+            {
+                from = value;
+                NotifyPropertyChanged();
+                ReloadDataFromServer();
+            }
+        }
+
+        public DateTime To
+        {
+            get { return to; }
+            set
+            {
+                to = value;
+                NotifyPropertyChanged();
+                ReloadDataFromServer();
+            }
+        }
+
+        public async void ReloadDataFromServer()
+        {
+            if (CurrentSeries == null)
+                return;
+
+            var data = await client.GetTimeSeriesData(CurrentSeries, new TimeRange(From, To));
+            CurrentData.Clear();
+
+            foreach (var d in data.Values)
+                CurrentData.Add(d);
+        }
+
+        public void Save()
+        {
+            var data = new TimeSeriesData(CurrentSeries.ID);
+            foreach (var d in CurrentData)
+            {
+                data.Add(d);
+            }
+
+            client.SaveTimeSeriesData(data);
+        }
+
+        public void Delete()
+        {
+            client.DeleteTimeSeriesData(CurrentSeries.ID, from, to);
+            CurrentData.Clear();
+        }
+
+        public void ExportToClipboard()
+        {
+            TimeSeriesDataExporter.ToClipboard(CurrentData);
+        }
+
+        public void ImportFromClipboard()
+        {
+            CurrentData.Clear();
+            foreach (var d in TimeSeriesDataImporter.FromClipboard())
+                CurrentData.Add(d);
         }
     }
 }

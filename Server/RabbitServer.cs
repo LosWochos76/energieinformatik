@@ -33,6 +33,7 @@ namespace Server
             bus.RespondAsync<SaveTimeSeriesDataRequest, SuccessMessage>(SaveTimeSeriesData);
             bus.RespondAsync<DeleteTimeSeriesDataRequest, SuccessMessage>(DeleteTimeSeriesData);
             bus.RespondAsync<DeleteTimeSeriesRequest, SuccessMessage>(DeleteTimeSeries);
+            bus.RespondAsync<SaveTimeSeriesRequest, SuccessMessage>(SaveTimeSeries);
         }
 
         private Task<TimeSeries[]> GetAllTimeSeriesAsync(GetAllTimeSeriesRequest r)
@@ -72,6 +73,14 @@ namespace Server
             return Task.Factory.StartNew(() =>
             {
                 return ts_repository.DeleteTimeSeries(r.TimeSeriesID);
+            });
+        }
+
+        public Task<SuccessMessage> SaveTimeSeries(SaveTimeSeriesRequest r)
+        {
+            return Task.Factory.StartNew(() =>
+            {
+                return ts_repository.SaveTimeSeries(r.Series);
             });
         }
 

@@ -24,7 +24,7 @@ namespace Server
 
             using (MySqlCommand command = connection.CreateCommand())
             {
-                command.CommandText = "SELECT * FROM timeseries order by ID";
+                command.CommandText = "SELECT * FROM timeseries order by name,id";
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -40,26 +40,6 @@ namespace Server
         private void FillCache()
         {
             cache = ReadTimeSeriesObjectsFromDb();
-            RestoreFullNames();
-        }
-
-        private void RestoreFullNames()
-        {
-            foreach (var t in from s in cache where s.ParentID == 0 select s)
-            {
-                t.FullName = t.Name;
-                RestoreFullNames(t);
-            }
-        }
-
-        private void RestoreFullNames(TimeSeries t)
-        {
-            var roots = from s in cache where s.ParentID == t.ID select s;
-            foreach (var u in roots)
-            {
-                u.FullName = t.FullName + "." + u.Name;
-                RestoreFullNames(u);
-            }
         }
 
         public TimeSeries[] GetAllTimeSeries()
@@ -72,9 +52,9 @@ namespace Server
             return (from s in cache where s.ID == id select s).SingleOrDefault();
         }
 
-        public TimeSeries GetTimeSeriesByFullName(string full_name)
+        public TimeSeries GetTimeSeriesByName(string name)
         {
-            return (from s in cache where s.FullName == full_name select s).SingleOrDefault();
+            return (from s in cache where s.Name == name select s).SingleOrDefault();
         }
 
         public SuccessMessage DeleteTimeSeries(int time_series_id)
@@ -100,10 +80,67 @@ namespace Server
         {
             var ts = new TimeSeries();
             ts.ID = Convert.ToInt32(reader["id"]);
-            ts.ParentID = reader["parent_id"] != DBNull.Value ? Convert.ToInt32(reader["parent_id"]) : 0;
             ts.Name = reader["name"].ToString();
             ts.Unit = (Unit)Convert.ToInt32(reader["unit"]);
             return ts;
+        }
+
+        public SuccessMessage SaveTimeSeries(TimeSeries series)
+        {
+            var result = GetTimeSeriesByName(series.Name);
+
+            if (series.ID == 0)
+            {
+                if (result == null)
+                {
+                    return SaveNewTimeSeries(series);
+                }
+                else
+                {
+                    return new SuccessMessage(false) { ErrorMessage = "Series with that name already exists!" };
+                }
+            }
+            else
+            {
+                if (result != null && result.ID != series.ID)
+                {
+                    return new SuccessMessage(false) { ErrorMessage = "Series with that name already exists!" };
+                }
+                else
+                {
+                    return UpdateTimeSeries(series);
+                }
+            }
+        }
+
+        private SuccessMessage SaveNewTimeSeries(TimeSeries series)
+        {
+            using (MySqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "INSERT INTO timeseries (name, unit) VALUES(@name, @unit)";
+                command.Parameters.AddWithValue("@name", series.Name);
+                command.Parameters.AddWithValue("@unit", series.Unit);
+                command.ExecuteNonQuery();
+                series.ID = (int)command.LastInsertedId;
+            }
+
+            FillCache();
+            return new SuccessMessage(true);
+        }
+
+        private SuccessMessage UpdateTimeSeries(TimeSeries series)
+        {
+            using (MySqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "update timeseries set name=@name, unit=@unit where id=@id";
+                command.Parameters.AddWithValue("@id", series.ID);
+                command.Parameters.AddWithValue("@name", series.Name);
+                command.Parameters.AddWithValue("@unit", series.Unit);
+                command.ExecuteNonQuery();
+            }
+
+            FillCache();
+            return new SuccessMessage(true);
         }
     }
 }

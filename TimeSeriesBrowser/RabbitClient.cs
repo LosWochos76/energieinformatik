@@ -45,5 +45,11 @@ namespace TimeSeriesGUI
             var request = new DeleteTimeSeriesDataRequest() { TimeSeriesID = time_series_id, From = from, To = to };
             return bus.RequestAsync<DeleteTimeSeriesDataRequest, SuccessMessage>(request);
         }
+
+        public Task<SuccessMessage> SaveTimeSeries(TimeSeries series)
+        {
+            var request = new SaveTimeSeriesRequest() { Series = series };
+            return bus.RequestAsync<SaveTimeSeriesRequest, SuccessMessage>(request);
+        }
     }
 }
