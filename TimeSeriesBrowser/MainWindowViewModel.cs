@@ -27,7 +27,16 @@ namespace TimeSeriesGUI
             CurrentData = new ObservableCollection<TimeSeriesValue>();
 
             client = ServiceInjector.GetInstance().GetRabbitClient();
-            CreateTimeSeriesViewModel();
+            client.TimeSeriesChanged += Client_TimeSeriesChanged;
+            LoadTimeSeriesFromServer();
+        }
+
+        private void Client_TimeSeriesChanged()
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                LoadTimeSeriesFromServer();
+            });
         }
 
         public TimeSeries CurrentSeries 
@@ -38,7 +47,7 @@ namespace TimeSeriesGUI
                 current_series = value;
                 NotifyPropertyChanged();
                 NotifyPropertyChanged("HasSeriesSelected");
-                ReloadDataFromServer();
+                LoadTimeSeriesDataFromServer();
             }
         }
 
@@ -47,7 +56,7 @@ namespace TimeSeriesGUI
             get { return current_series != null; }
         }
 
-        private async void CreateTimeSeriesViewModel()
+        private async void LoadTimeSeriesFromServer()
         {
             original_series = await client.GetAllTimeSeries();
 
@@ -75,7 +84,7 @@ namespace TimeSeriesGUI
             {
                 from = value;
                 NotifyPropertyChanged();
-                ReloadDataFromServer();
+                LoadTimeSeriesDataFromServer();
             }
         }
 
@@ -86,11 +95,11 @@ namespace TimeSeriesGUI
             {
                 to = value;
                 NotifyPropertyChanged();
-                ReloadDataFromServer();
+                LoadTimeSeriesDataFromServer();
             }
         }
 
-        public async void ReloadDataFromServer()
+        public async void LoadTimeSeriesDataFromServer()
         {
             if (CurrentSeries == null)
                 return;

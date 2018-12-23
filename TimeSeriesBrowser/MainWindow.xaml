@@ -15,7 +15,7 @@
             <MenuItem Header="_Zeitreihe">
                 <MenuItem Header="Neu" Click="New_TimeSeries_Click" />
                 <MenuItem Header="Ändern" Click="Edit_TimeSeries_Click" IsEnabled="{Binding HasSeriesSelected}" />
-                <MenuItem Header="Löschen" IsEnabled="{Binding HasSelectedSeries}" />
+                <MenuItem Header="Löschen" Click="Delete_TimeSeries_Click" IsEnabled="{Binding HasSelectedSeries}" />
             </MenuItem>
             <MenuItem Header="_Daten" IsEnabled="{Binding HasSeriesSelected}">
                 <MenuItem Header="Speichern" Click="Save_Data_Click" />

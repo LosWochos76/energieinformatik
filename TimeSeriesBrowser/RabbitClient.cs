@@ -7,14 +7,23 @@ using System.Threading.Tasks;
 
 namespace TimeSeriesGUI
 {
+    public delegate void TimeSeriesChangedHandler();
+
     public class RabbitClient : IDisposable
     {
         private IBus bus;
+
+        public event TimeSeriesChangedHandler TimeSeriesChanged;
 
         public RabbitClient()
         {
             LogProvider.SetCurrentLogProvider(ConsoleLogProvider.Instance);
             this.bus = RabbitHutch.CreateBus("host=localhost");
+
+            bus.SubscribeAsync<TimeSeriesChanged>("client", message => Task.Factory.StartNew(() =>
+            {
+                RaiseTimeSeriesChangedEvent();
+            }));
         }
 
         public void Dispose()
@@ -50,6 +59,17 @@ namespace TimeSeriesGUI
         {
             var request = new SaveTimeSeriesRequest() { Series = series };
             return bus.RequestAsync<SaveTimeSeriesRequest, SuccessMessage>(request);
+        }
+
+        public Task<SuccessMessage> DeleteTimeSeries(int time_series_id)
+        {
+            var request = new DeleteTimeSeriesRequest() { TimeSeriesID = time_series_id };
+            return bus.RequestAsync<DeleteTimeSeriesRequest, SuccessMessage>(request);
+        }
+
+        private void RaiseTimeSeriesChangedEvent()
+        {
+            TimeSeriesChanged?.Invoke();
         }
     }
 }

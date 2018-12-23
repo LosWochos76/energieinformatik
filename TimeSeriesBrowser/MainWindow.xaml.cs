@@ -66,7 +66,6 @@ namespace TimeSeriesGUI
                 var client_result = await ServiceInjector.GetInstance().GetRabbitClient().SaveTimeSeries(series);
                 if (client_result.Success)
                 {
-                    view_model.AllSeries.Add(series);
                     view_model.CurrentSeries = series;
                 }
                 else
@@ -89,6 +88,21 @@ namespace TimeSeriesGUI
                 { 
                     MessageBox.Show(this, "Error: " + client_result.ErrorMessage);
                 }
+            }
+        }
+
+        private async void Delete_TimeSeries_Click(object sender, RoutedEventArgs e)
+        {
+            var series = view_model.CurrentSeries;
+            var client_result = await ServiceInjector.GetInstance().GetRabbitClient().DeleteTimeSeries(series.ID);
+
+            if (client_result.Success)
+            {
+                view_model.CurrentSeries = null;
+            }
+            else
+            {
+                MessageBox.Show(this, "Error: " + client_result.ErrorMessage);
             }
         }
     }

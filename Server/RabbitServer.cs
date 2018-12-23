@@ -72,7 +72,9 @@ namespace Server
         {
             return Task.Factory.StartNew(() =>
             {
-                return ts_repository.DeleteTimeSeries(r.TimeSeriesID);
+                var result = ts_repository.DeleteTimeSeries(r.TimeSeriesID);
+                bus.Publish(new TimeSeriesChanged());
+                return result;
             });
         }
 
@@ -80,7 +82,9 @@ namespace Server
         {
             return Task.Factory.StartNew(() =>
             {
-                return ts_repository.SaveTimeSeries(r.Series);
+                var result = ts_repository.SaveTimeSeries(r.Series);
+                bus.Publish(new TimeSeriesChanged());
+                return result;
             });
         }
 

@@ -73,6 +73,7 @@ namespace Server
                 command.ExecuteNonQuery();
             }
 
+            FillCache();
             return new SuccessMessage(true);
         }
 
