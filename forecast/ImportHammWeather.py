@@ -20,3 +20,7 @@ df = df.rename(columns={
 
 engine = create_engine('postgresql://postgres@localhost:5432/energieinformatik')
 df.to_sql('weather', engine, index=False, if_exists='replace')
+
+import matplotlib.pyplot as plt
+df.plot()
+plt.show()

@@ -14,7 +14,7 @@ class Decomposer:
         count = 0
         while current < len(self.data.index) - self.frequency - 1:
             sum += self.data.at[current, "detrended"]
-            current += 24
+            current += self.frequency
             count = count + 1
         return sum / count
     
@@ -43,9 +43,9 @@ class Decomposer:
     
     def __compute_residuals(self):
         if self.method == "additive":
-            self.data["residuals"] = self.data["data"] - self.data["trend"] - self.data["season"]
+            self.data["residuals"] = self.data["detrended"] - self.data["season"]
         elif self.method == "multiplicative":
-            self.data["residuals"] = self.data["data"] / (self.data["trend"] * self.data["season"])
+            self.data["residuals"] = self.data["detrended"] / self.data["season"]
 
     def decompose(self):
         self.__compute_trend()
