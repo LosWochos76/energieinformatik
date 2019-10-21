@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# Import weather-data from uni bayreuth into a postgres-database
 
 from datetime import date
 import os

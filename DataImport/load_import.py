@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# import load-data into a postgres-database
+
 import pandas as pd
 from sqlalchemy import create_engine
 
