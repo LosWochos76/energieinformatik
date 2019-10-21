@@ -1,10 +1,11 @@
+# Import weather data for the city of Hamm into a postgreSQL-database.
+# You need to download the weather-package from OPSD first!
+
 import pandas as pd
 from sqlalchemy import create_engine
 
-# You need to download the weather-package from OPSD first!
-df = pd.read_csv('weather_data.csv', sep=',', usecols=["utc_timestamp", "DEA5_windspeed_10m", "DEA5_temperature",  
-  "DEA5_radiation_direct_horizontal", "DEA5_radiation_diffuse_horizontal"])
-
+cols=["utc_timestamp", "DEA5_windspeed_10m", "DEA5_temperature", "DEA5_radiation_direct_horizontal", "DEA5_radiation_diffuse_horizontal"]
+df = pd.read_csv('weather_data.csv', sep=',', usecols=cols)
 df['utc_timestamp'] = pd.to_datetime(df['utc_timestamp'])
 df['DEA5_windspeed_10m'] = df['DEA5_windspeed_10m'].astype(float)
 df['DEA5_temperature'] = df['DEA5_temperature'].astype(float)
@@ -20,7 +21,3 @@ df = df.rename(columns={
 
 engine = create_engine('postgresql://postgres@localhost:5432/energieinformatik')
 df.to_sql('weather', engine, index=False, if_exists='replace')
-
-import matplotlib.pyplot as plt
-df.plot()
-plt.show()
