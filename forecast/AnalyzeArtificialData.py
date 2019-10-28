@@ -18,6 +18,8 @@ def create_data():
     return data
 
 data = create_data()
+#data.plot(x='timestamp', y=['data'])
+#plt.show()
 
 #hw = HoltWinters(data)
 #hw.hw2(0.5, 1, 0.001, 1, 20)
