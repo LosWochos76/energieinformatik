@@ -16,6 +16,10 @@ def makeInt(df, name):
 #engine = create_engine('postgresql://hshl:hshl@localhost:5432/hshl')
 engine = create_engine('postgresql://postgres@localhost:5432/energieinformatik')
 
+with engine.connect() as con:
+    con.execute('drop table wetter.wetterstation;')
+	con.execute('drop table wetter.wettermessung;')
+
 today = date.today()
 d = today.strftime("%Y-%m-%d")
 zipurl = 'https://dbup2date.uni-bayreuth.de/blocklysql/downloads/wetterdaten/{}_wetterdaten_CSV.zip'.format(d)
@@ -63,8 +67,8 @@ try:
 except:
 	print("Import der Wettermessungen fehlgeschlagen!")
 
-#os.remove("wetterdaten_Wettermessung.csv")
-#os.remove("wetterdaten_Wetterstation.csv")
+os.remove("wetterdaten_Wettermessung.csv")
+os.remove("wetterdaten_Wetterstation.csv")
 
 with engine.connect() as con:
     con.execute('alter table wetter.wetterstation add column location geography;')

@@ -15,6 +15,12 @@ def makeInt(df, name):
 engine = create_engine('postgresql://postgres@localhost:5432/energieinformatik')
 #engine = create_engine('postgresql://hshl:hshl@localhost:5432/hshl')
 
+with engine.connect() as con:
+    con.execute('drop table bundesliga.liga;')
+	con.execute('drop table bundesliga.spiel;')
+	con.execute('drop table bundesliga.spieler;')
+	con.execute('drop table bundesliga.verein;')
+
 today = date.today()
 d = today.strftime("%Y-%m-%d")
 zipurl = 'https://dbup2date.uni-bayreuth.de/blocklysql/downloads/bundesliga/{}_bundesliga_CSV.zip'.format(d)
