@@ -1,13 +1,47 @@
 #!/usr/bin/python3
 # import the list of renewable powerplants in germany into a postgres database
-# You need to download the csv-file manually from https://data.open-power-system-data.org/renewable_power_plants/
 
+from datetime import date
+import os
 import pandas as pd
 from sqlalchemy import create_engine
+from io import BytesIO
+from urllib.request import urlopen
+import zipfile
+import urllib
+import ssl
 
-df = pd.read_csv('renewable_power_plants_DE.csv', sep=',')
-df['commissioning_date'] = pd.to_datetime(df['commissioning_date'])
-df['decommissioning_date'] = pd.to_datetime(df['decommissioning_date'])
+engine = create_engine('postgresql://admin:secret@localhost:5432/postgres')
 
-engine = create_engine('postgresql://postgres@localhost:5432/energieinformatik')
-df.to_sql('renewable_power_plants', engine, index=False, if_exists='replace')
+try:
+	print("Lösche alte Daten in der Datenbank...")
+	with engine.connect() as con:
+		con.execute('drop table energieinformatik.renewable_power_plants;')
+except:
+	print("Einige Tabellen konnten nicht gelöscht werden!");
+
+zipurl = 'https://data.open-power-system-data.org/renewable_power_plants/2020-08-25/renewable_power_plants_DE.csv'
+
+try:
+	print("Lade CSV-Datei herunter...")
+	ctx = ssl.create_default_context()
+	ctx.check_hostname = False
+	ctx.verify_mode = ssl.CERT_NONE
+	with urllib.request.urlopen(zipurl, context=ctx) as u, open("renewable_power_plants_DE.csv", 'wb') as f:
+	    f.write(u.read())
+except:
+	printf("Datei konnte nicht heruntergeladen werden!");
+
+try:
+	df = pd.read_csv('renewable_power_plants_DE.csv', sep=',')
+	df['commissioning_date'] = pd.to_datetime(df['commissioning_date'])
+	df['decommissioning_date'] = pd.to_datetime(df['decommissioning_date'])
+	df.to_sql('renewable_power_plants', engine, index=False, if_exists='replace')
+except:
+	print("Konnte die Daten nicht in die Datenbank importieren")
+
+try:
+	print("Lösche CSV-Dateien...")
+	os.remove("renewable_power_plants_DE.csv")
+except:
+	print("Einige heruntergeladene Dateien konnten nicht gelöscht werden!")
