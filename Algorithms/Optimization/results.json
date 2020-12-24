@@ -1,0 +1,54 @@
+{
+    "Problem": [
+        {
+            "Lower bound": 1682.35294117647,
+            "Name": "unknown",
+            "Number of constraints": 3,
+            "Number of nonzeros": 5,
+            "Number of objectives": 1,
+            "Number of variables": 3,
+            "Sense": "maximize",
+            "Upper bound": 1682.35294117647
+        }
+    ],
+    "Solution": [
+        {
+            "number of solutions": 1,
+            "number of solutions displayed": 1
+        },
+        {
+            "Constraint": "No values",
+            "Gap": 0.0,
+            "Message": null,
+            "Objective": {
+                "profit": {
+                    "Value": 1682.352941176472
+                }
+            },
+            "Problem": {},
+            "Status": "feasible",
+            "Variable": {
+                "GasMWh": {
+                    "Value": 164.705882352941
+                },
+                "KohleMWh": {
+                    "Value": 135.294117647059
+                }
+            }
+        }
+    ],
+    "Solver": [
+        {
+            "Error rc": 0,
+            "Statistics": {
+                "Branch and bound": {
+                    "Number of bounded subproblems": 0,
+                    "Number of created subproblems": 0
+                }
+            },
+            "Status": "ok",
+            "Termination condition": "optimal",
+            "Time": 0.02199268341064453
+        }
+    ]
+}

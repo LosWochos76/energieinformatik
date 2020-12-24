@@ -1,0 +1,4 @@
+plant,production_costs,startup_costs,p_max,p_min,max_ramp,initial_generation,has_initial_generation
+lignite,50,2000,300,200,10,300,1
+coal,70,500,250,20,15,100,1
+gas,150,200,200,5,200,0,0
